@@ -1,0 +1,30 @@
+---
+# tasks file for whirm.anontunnel_helper
+
+- name: Create tunnel_helper group
+  group: name=tunnel_helper
+
+- name: Create tunnel_helper user
+  user: name=tunnel_helper group=tunnel_helper home=/var/lib/tunnel_helper
+
+- name: Install systemd unit
+  command: cp /opt/tribler/systemd/anontunnel_helper@.service /etc/systemd/system/anontunnel_helper@.service
+  register: service_file
+
+- name: Create vars dir for the tunnel helper service
+  file: dest=/etc/systemd/system/anontunnel_helper@.service.d state=directory
+
+- name: Enable/Disable exit mode
+  ini_file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf section=Service option=Environment value="EXIT_ENABLED={{anontunnel_exit_mode_enabled}}"
+
+- name: Reload systemd
+  shell: systemctl daemon-reload
+  when: service_file.changed
+
+- name: Enable one tunnel helper service per CPU core
+  service: name=anontunnel_helper@{{item}}.service enabled=yes state=restarted
+  with_sequence: count={{ansible_processor_vcpus}}
+
+- name: Make sure the services are running.
+  service: name=anontunnel_helper@{{item}}.service enabled=yes state=started
+  with_sequence: count={{ansible_processor_vcpus}}

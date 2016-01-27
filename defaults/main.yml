@@ -1,0 +1,4 @@
+---
+# defaults file for whirm.anontunnel_helper
+
+anontunnel_exit_mode_enabled: false
