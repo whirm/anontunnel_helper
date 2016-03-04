@@ -21,10 +21,14 @@
   shell: systemctl daemon-reload
   when: service_file.changed
 
+- name: Disable old services
+  service: name=anontunnel_helper@{{item}}.service enabled=no state=stopped
+  with_sequence: count={{ansible_processor_vcpus * 3}}
+
 - name: Enable one tunnel helper service per CPU core
   service: name=anontunnel_helper@{{item}}.service enabled=yes state=restarted
-  with_sequence: count={{ansible_processor_vcpus}}
+  with_sequence: count={{ansible_processor_vcpus * 1.5|int }}
 
 - name: Make sure the services are running.
   service: name=anontunnel_helper@{{item}}.service enabled=yes state=started
-  with_sequence: count={{ansible_processor_vcpus}}
+  with_sequence: count={{ansible_processor_vcpus * 1.5|int }}

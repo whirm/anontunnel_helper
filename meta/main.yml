@@ -1,6 +1,6 @@
 galaxy_info:
   author: Elric Milon
-  description: Install and configure an anontunnel helper server
+  description: Installs and configures an anontunnel helper server
   company: TUDelft
   license: GPLv3
 
