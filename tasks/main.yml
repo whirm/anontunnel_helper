@@ -14,8 +14,12 @@
 - name: Create vars dir for the tunnel helper service
   file: dest=/etc/systemd/system/anontunnel_helper@.service.d state=directory
 
-- name: Enable/Disable exit mode
-  ini_file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf section=Service option=Environment value="EXIT_ENABLED={{anontunnel_exit_mode_enabled}}"
+- name: Clear custom settings for the tunnel helper
+  file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf state=absent
+
+- name: Maybe enable exit mode
+  ini_file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf section=Service option=Environment value="EXTRA_TUNNEL_ARGS=-x"
+  when: anontunnel_exit_mode_enabled == true
 
 - name: Reload systemd
   shell: systemctl daemon-reload
