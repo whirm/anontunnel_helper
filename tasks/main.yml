@@ -17,9 +17,13 @@
 - name: Clear custom settings for the tunnel helper
   file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf state=absent
 
-- name: Maybe enable exit mode
+- name: Maybe enable exit mode {{anontunnel_exit_mode_enabled}} {{anontunnel_multichain_enabled}}
   ini_file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf section=Service option=Environment value="EXTRA_TUNNEL_ARGS=-x"
-  when: anontunnel_exit_mode_enabled == true
+  when: (anontunnel_exit_mode_enabled == true and anontunnel_multichain_enabled == false)
+
+- name: Maybe enable multichain {{anontunnel_multichain_enabled}}}
+  ini_file: dest=/etc/systemd/system/anontunnel_helper@.service.d/exit_mode.conf section=Service option=Environment value='EXTRA_TUNNEL_ARGS=-xM'
+  when: anontunnel_multichain_enabled == true
 
 - name: Reload systemd
   shell: systemctl daemon-reload
